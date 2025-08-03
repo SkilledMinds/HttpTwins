@@ -17,11 +17,10 @@ Apply `@HttpTwins` to REST API endpoints where you need to inspect incoming HTTP
 
 **Example Usage**
 ```java
-@HttpTwins
-@GetMapping("/books")
-public List<Book> getBooks() {
-    // Your logic here
-}
+@PostMapping @HttpTwins
+    public Book createBook(@RequestBody Book book) {
+        return bookRepository.save(book);
+    }
 ```
 
 **Features**
