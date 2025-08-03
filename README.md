@@ -1,6 +1,18 @@
 # HttpTwins
 HttpTwins: A Design Pattern for Asynchronous HTTP Request Duplication
 
+Here's a short note and demo code for my HttpTwins design pattern — a custom annotation for creating asynchronous duplicates of incoming HTTP requests.
+
+In the Spring Boot demo, it captures and logs the complete HTTP request (method, URI, headers, body) to the console asynchronously, enabling non-blocking debugging and monitoring.
+
+This pattern is useful in scenarios such as:
+
+Distributing the same payload to multiple remote systems.
+
+Powering AI agents that need access to live HTTP input.
+
+Inspecting incoming requests for debugging, compliance, or analytics — particularly in development or staging environments.
+
 # HttpTwins
 
 **Purpose**  
