@@ -1,0 +1,15 @@
+# Gradle cache
+.gradle/
+
+# Build output
+build/
+
+# IntelliJ IDEA project files
+.idea/
+*.iml
+*.iws
+
+# Local settings and logs
+.DS_Store
+*.log
+*.tmp

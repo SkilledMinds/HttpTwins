@@ -13,16 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.example.httpTwins;
+package com.example.httpTwins.repository;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
+import com.example.httpTwins.model.Book;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-@SpringBootApplication
-public class HttpTwinsApplication {
-
-	public static void main(String[] args) {
-		SpringApplication.run(HttpTwinsApplication.class, args);
-	}
-
+@Repository
+public interface BookRepository extends JpaRepository<Book, Long> {
 }

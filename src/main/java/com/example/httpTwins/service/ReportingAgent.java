@@ -13,16 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.example.httpTwins;
+package com.example.httpTwins.service;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.stereotype.Service;
 
-@SpringBootApplication
-public class HttpTwinsApplication {
+@Service("reportingAgent")
+public class ReportingAgent implements RequestProcessor {
 
-	public static void main(String[] args) {
-		SpringApplication.run(HttpTwinsApplication.class, args);
-	}
-
+    @Override
+    public void process(HttpServletRequest request) {
+        System.out.println("--- ReportingAgent Processor ---");
+        System.out.println("Generating report for request to: " + request.getRequestURI());
+        System.out.println("--------------------------------");
+    }
 }

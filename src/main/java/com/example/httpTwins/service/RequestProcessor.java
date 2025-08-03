@@ -13,16 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.example.httpTwins;
+package com.example.httpTwins.service;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
+import jakarta.servlet.http.HttpServletRequest;
 
-@SpringBootApplication
-public class HttpTwinsApplication {
+/**
+ * Defines the contract for a class that can process a mirrored HTTP request.
+ */
+public interface RequestProcessor {
 
-	public static void main(String[] args) {
-		SpringApplication.run(HttpTwinsApplication.class, args);
-	}
-
+    /**
+     * Processes the incoming HTTP request.
+     *
+     * @param request The HttpServletRequest to be processed.
+     */
+    void process(HttpServletRequest request);
 }
