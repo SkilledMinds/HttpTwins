@@ -30,3 +30,6 @@ Apply `@HttpTwins` to REST API endpoints where you need to inspect incoming HTTP
 
 **Note**  
 For full request body logging, use a request wrapper or filter to cache the body, as servlet request streams can only be read once.
+
+**Design & logs** 
+Visit HttpTwin_logs and design images in parallel to this file.
