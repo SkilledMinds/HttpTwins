@@ -32,6 +32,7 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.util.ContentCachingRequestWrapper;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.Optional;
 
@@ -77,6 +78,10 @@ public class HttpTwinsAspect {
 
     private void processLocalDestination(HttpServletRequest request, String destination) {
         try {
+            // Log the detailed request first
+            logRequestDetails(request, destination);
+
+            // Then, execute the processor's logic
             RequestProcessor processor = applicationContext.getBean(destination, RequestProcessor.class);
             processor.process(request);
         } catch (NoSuchBeanDefinitionException e) {
@@ -104,11 +109,33 @@ public class HttpTwinsAspect {
     }
 
     private RequestProcessor createDefaultProcessor() {
-        return request -> {
-            System.out.println("--- HttpTwins Default Logger ---");
-            System.out.println("Method: " + request.getMethod());
-            System.out.println("URI: " + request.getRequestURI());
-            System.out.println("------------------------------");
-        };
+        // The default processor now just calls the centralized logger
+        return request -> logRequestDetails(request, "Default Logger");
+    }
+
+    /**
+     * Logs the details of the incoming HttpServletRequest.
+     *
+     * @param request The request to log.
+     * @param processorName The name of the processor handling the request.
+     */
+    private void logRequestDetails(HttpServletRequest request, String processorName) {
+        System.out.println("\n==================== HttpTwins Received Request for [" + processorName + "] ====================");
+        System.out.println("Method: " + request.getMethod());
+        System.out.println("URI: " + request.getRequestURI());
+
+        System.out.println("--- Headers ---");
+        Collections.list(request.getHeaderNames())
+            .forEach(name -> System.out.println(name + ": " + request.getHeader(name)));
+
+        System.out.println("--- Body ---");
+        ContentCachingRequestWrapper wrapper = (ContentCachingRequestWrapper) request;
+        byte[] body = wrapper.getContentAsByteArray();
+        if (body.length > 0) {
+            System.out.println(new String(body, StandardCharsets.UTF_8));
+        } else {
+            System.out.println("[No Body]");
+        }
+        System.out.println("====================================================================================\n");
     }
 }

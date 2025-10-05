@@ -23,12 +23,10 @@ public class RemoteERP implements RequestProcessor {
 
     @Override
     public void process(HttpServletRequest request) {
-        // In a real scenario, you would format and send this data
-        // to a remote ERP system.
-        System.out.println("--- RemoteERP Processor ---");
-        System.out.println("Received request to be sent to the ERP.");
-        System.out.println("URI: " + request.getRequestURI());
-        System.out.println("Method: " + request.getMethod());
-        System.out.println("--------------------------");
+        // The HttpTwinsAspect now handles the detailed logging.
+        // This service can now focus purely on its business logic.
+
+        // For example, you would format the request data and send it to a remote ERP system here.
+        System.out.println("-> Executing RemoteERP business logic.");
     }
 }

@@ -1,0 +1,12 @@
+GET http://localhost:8080/books
+Accept: application/json
+
+###
+
+POST http://localhost:8080/books
+Content-Type: application/json
+
+{
+  "title": "The Hitchhiker's Guide to the Galaxy",
+  "author": "Douglas Adams"
+}

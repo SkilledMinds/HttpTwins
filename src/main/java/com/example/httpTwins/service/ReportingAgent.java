@@ -23,8 +23,10 @@ public class ReportingAgent implements RequestProcessor {
 
     @Override
     public void process(HttpServletRequest request) {
-        System.out.println("--- ReportingAgent Processor ---");
-        System.out.println("Generating report for request to: " + request.getRequestURI());
-        System.out.println("--------------------------------");
+        // The HttpTwinsAspect now handles the detailed logging.
+        // This service can now focus purely on its business logic.
+
+        // For example, you would generate a report or update analytics based on the request here.
+        System.out.println("-> Executing ReportingAgent business logic.");
     }
 }

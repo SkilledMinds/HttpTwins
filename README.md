@@ -121,6 +121,50 @@ public class RemoteERP implements RequestProcessor {
 ```
 
 ---
+### 3. Supporting logs
+
+Use HTTP client attached with project to execute REST APIs attached with HTTPTwins
+
+```java
+==================== HttpTwins Received Request for [remoteERP] ====================
+
+        ==================== HttpTwins Received Request for [reportingAgent] ====================
+Method: POST
+Method: POST
+URI: /books
+--- Headers ---
+URI: /books
+--- Headers ---
+content-length: 83
+host: localhost:8080
+user-agent: Java-http-client/21.0.8
+content-type: application/json
+--- Body ---
+content-length: 83
+host: localhost:8080
+user-agent: Java-http-client/21.0.8
+content-type: application/json
+{
+    "title": "The Hitchhiker's Guide to the Galaxy",
+        "author": "Douglas Adams"
+}
+
+====================================================================================
+
+        -> Executing RemoteERP business logic.
+        --- Body ---
+        {
+        "title": "The Hitchhiker's Guide to the Galaxy",
+        "author": "Douglas Adams"
+        }
+
+        ====================================================================================
+
+        -> Executing ReportingAgent business logic.
+HttpTwins ERROR: Failed to mirror request to remote destination 'https://ecom.buyers/items'. Reason: I/O error on POST request for "https://ecom.buyers/items": ecom.buyers
+HttpTwins ERROR: Failed to mirror request to remote destination 'https://http-twins-remote-test.free.beeceptor.com/regionalTests'. Reason: 404 Not Found on POST request for "https://http-twins-remote-test.free.beeceptor.com/regionalTests": "Hey ya! Great to see you here. BTW, nothing is configured here. Create a mock server on Beeceptor.com"
+
+```
 
 ## Dive Deeper and Explore the Code!
 
