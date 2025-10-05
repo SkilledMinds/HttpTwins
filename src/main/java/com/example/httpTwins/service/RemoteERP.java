@@ -17,16 +17,36 @@ package com.example.httpTwins.service;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.web.util.ContentCachingRequestWrapper;
+
+import java.nio.charset.StandardCharsets;
+import java.util.Collections;
 
 @Service("remoteERP") // This bean name matches the annotation's destination
 public class RemoteERP implements RequestProcessor {
 
     @Override
     public void process(HttpServletRequest request) {
-        // The HttpTwinsAspect now handles the detailed logging.
-        // This service can now focus purely on its business logic.
+        // This processor now decides exactly what to log.
+        System.out.println("\n==================== HttpTwins Request for [RemoteERP] ====================");
+        System.out.println("Method: " + request.getMethod());
+        System.out.println("URI: " + request.getRequestURI());
 
-        // For example, you would format the request data and send it to a remote ERP system here.
-        System.out.println("-> Executing RemoteERP business logic.");
+        System.out.println("--- Headers ---");
+        Collections.list(request.getHeaderNames())
+            .forEach(name -> System.out.println(name + ": " + request.getHeader(name)));
+
+        System.out.println("--- Body ---");
+        ContentCachingRequestWrapper wrapper = (ContentCachingRequestWrapper) request;
+        byte[] body = wrapper.getContentAsByteArray();
+        if (body.length > 0) {
+            System.out.println(new String(body, StandardCharsets.UTF_8));
+        } else {
+            System.out.println("[No Body]");
+        }
+
+        // After logging, it can execute its specific business logic.
+        System.out.println("-> Executing RemoteERP business logic...");
+        System.out.println("=========================================================================\n");
     }
 }
