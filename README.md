@@ -148,7 +148,7 @@ content-type: application/json
 
         -> Executing RemoteERP business logic...
         =========================================================================
-
+( These are dummy remote endpoints )
 HttpTwins ERROR: Failed to mirror request to remote destination 'https://ecom.buyers/items'. Reason: I/O error on POST request for "https://ecom.buyers/items": ecom.buyers
 HttpTwins ERROR: Failed to mirror request to remote destination 'https://http-twins-remote-test.free.beeceptor.com/regionalTests'. Reason: 404 Not Found on POST request for "https://http-twins-remote-test.free.beeceptor.com/regionalTests": "Hey ya! Great to see you here. BTW, nothing is configured here. Create a mock server on Beeceptor.com"
 
