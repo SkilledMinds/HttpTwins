@@ -18,6 +18,8 @@ package com.example.httpTwins.controller;
 import com.example.httpTwins.annotation.HttpTwins;
 import com.example.httpTwins.model.Book;
 import com.example.httpTwins.repository.BookRepository;
+import com.example.httpTwins.service.RemoteERP;
+import com.example.httpTwins.service.ReportingAgent;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -33,18 +35,19 @@ public class BookController {
     }
 
     @GetMapping
-    @HttpTwins(localdestinations = "reportingAgent") // Fan-out to a local reporting agent
+    @HttpTwins(localdestinations = ReportingAgent.class, active = false) // Fan-out to a local reporting agent
     public List<Book> getBooks() {
         return bookRepository.findAll();
     }
 
     @PostMapping
     @HttpTwins(
-        localdestinations = {"remoteERP", "reportingAgent"},
+        localdestinations = {RemoteERP.class, ReportingAgent.class},
         remoteDestinations = {
             "https://http-twins-remote-test.free.beeceptor.com/regionalTests", // A test endpoint to receive mirrored requests
             "https://ecom.buyers/items" // A second remote destination
         }
+        , active = true
     )
     public Book createBook(@RequestBody Book book) {
         return bookRepository.save(book);

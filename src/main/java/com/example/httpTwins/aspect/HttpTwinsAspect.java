@@ -16,36 +16,33 @@
 package com.example.httpTwins.aspect;
 
 import com.example.httpTwins.annotation.HttpTwins;
+import com.example.httpTwins.service.RemoteProcessor;
 import com.example.httpTwins.service.RequestProcessor;
 import jakarta.servlet.http.HttpServletRequest;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.context.ApplicationContext;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
-import org.springframework.web.util.ContentCachingRequestWrapper;
 
-import java.util.Collections;
 import java.util.Optional;
 
 @Aspect
 @Component
 public class HttpTwinsAspect {
 
+    private static final Logger logger = LoggerFactory.getLogger(HttpTwinsAspect.class);
+
     private final ApplicationContext applicationContext;
     private final RequestProcessor defaultRequestProcessor;
-    private final RestTemplate restTemplate;
 
-    public HttpTwinsAspect(ApplicationContext applicationContext, RestTemplate restTemplate) {
+    public HttpTwinsAspect(ApplicationContext applicationContext) {
         this.applicationContext = applicationContext;
-        this.restTemplate = restTemplate;
         this.defaultRequestProcessor = createDefaultProcessor();
     }
 
@@ -59,13 +56,15 @@ public class HttpTwinsAspect {
                 .map(ServletRequestAttributes::getRequest)
                 .ifPresent(request -> {
                     // Handle local destinations
-                    for (String destination : httpTwins.localdestinations()) {
-                        new Thread(() -> processLocalDestination(request, destination)).start();
+                    for (Class<? extends RequestProcessor> destinationClass : httpTwins.localdestinations()) {
+                        new Thread(() -> processLocalDestination(request, destinationClass)).start();
                     }
 
                     // Handle remote destinations
+                    Class<? extends RemoteProcessor> remoteProcessorClass = httpTwins.remoteProcessor();
+                    RemoteProcessor remoteProcessor = applicationContext.getBean(remoteProcessorClass);
                     for (String remoteUrl : httpTwins.remoteDestinations()) {
-                        new Thread(() -> processRemoteDestination(request, remoteUrl)).start();
+                        new Thread(() -> remoteProcessor.process(request, remoteUrl)).start();
                     }
 
                     // Handle default case if no destinations are specified
@@ -75,40 +74,21 @@ public class HttpTwinsAspect {
                 });
     }
 
-    private void processLocalDestination(HttpServletRequest request, String destination) {
+    private void processLocalDestination(HttpServletRequest request, Class<? extends RequestProcessor> destinationClass) {
         try {
-            RequestProcessor processor = applicationContext.getBean(destination, RequestProcessor.class);
+            RequestProcessor processor = applicationContext.getBean(destinationClass);
             processor.process(request);
         } catch (NoSuchBeanDefinitionException e) {
-            System.err.println("HttpTwins WARNING: No RequestProcessor bean found with name '" + destination + "'.");
-        }
-    }
-
-    private void processRemoteDestination(HttpServletRequest request, String remoteUrl) {
-        try {
-            byte[] body = ((ContentCachingRequestWrapper) request).getContentAsByteArray();
-
-            HttpHeaders headers = new HttpHeaders();
-            Collections.list(request.getHeaderNames())
-                .forEach(name -> headers.add(name, request.getHeader(name)));
-
-            HttpEntity<byte[]> entity = new HttpEntity<>(body, headers);
-            HttpMethod method = HttpMethod.valueOf(request.getMethod());
-
-            restTemplate.exchange(remoteUrl, method, entity, String.class);
-            System.out.println("HttpTwins: Successfully mirrored request to remote destination: " + remoteUrl);
-
-        } catch (Exception e) {
-            System.err.println("HttpTwins ERROR: Failed to mirror request to remote destination '" + remoteUrl + "'. Reason: " + e.getMessage());
+            logger.warn("HttpTwins WARNING: No RequestProcessor bean found of type '{}'.", destinationClass.getName());
         }
     }
 
     private RequestProcessor createDefaultProcessor() {
         return request -> {
-            System.out.println("\n--- HttpTwins Default Logger ---");
-            System.out.println("Method: " + request.getMethod());
-            System.out.println("URI: " + request.getRequestURI());
-            System.out.println("------------------------------\n");
+            logger.info("\n--- HttpTwins Default Logger ---");
+            logger.info("Method: {}", request.getMethod());
+            logger.info("URI: {}", request.getRequestURI());
+            logger.info("------------------------------\n");
         };
     }
 }

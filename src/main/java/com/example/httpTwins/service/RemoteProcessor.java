@@ -16,20 +16,17 @@
 package com.example.httpTwins.service;
 
 import jakarta.servlet.http.HttpServletRequest;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
 
-@Service
-public class ReportingAgent implements RequestProcessor {
+/**
+ * Defines the contract for a class that can process a mirrored HTTP request and send it to a remote destination.
+ */
+public interface RemoteProcessor {
 
-    private static final Logger logger = LoggerFactory.getLogger(ReportingAgent.class);
-
-    @Override
-    public void process(HttpServletRequest request) {
-        logger.info("\n--- HttpTwins Request for [ReportingAgent] ---");
-        logger.info("Processing {} request for URI: {}", request.getMethod(), request.getRequestURI());
-        logger.info("-> Executing ReportingAgent business logic...");
-        logger.info("--------------------------------------------\n");
-    }
+    /**
+     * Processes the incoming HTTP request and sends it to the specified remote URL.
+     *
+     * @param request The HttpServletRequest to be processed.
+     * @param remoteUrl The remote URL to which the request should be sent.
+     */
+    void process(HttpServletRequest request, String remoteUrl);
 }

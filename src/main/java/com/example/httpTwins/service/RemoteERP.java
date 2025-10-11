@@ -16,37 +16,39 @@
 package com.example.httpTwins.service;
 
 import jakarta.servlet.http.HttpServletRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.ContentCachingRequestWrapper;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 
-@Service("remoteERP") // This bean name matches the annotation's destination
+@Service
 public class RemoteERP implements RequestProcessor {
+
+    private static final Logger logger = LoggerFactory.getLogger(RemoteERP.class);
 
     @Override
     public void process(HttpServletRequest request) {
-        // This processor now decides exactly what to log.
-        System.out.println("\n==================== HttpTwins Request for [RemoteERP] ====================");
-        System.out.println("Method: " + request.getMethod());
-        System.out.println("URI: " + request.getRequestURI());
+        logger.info("\n==================== HttpTwins Request for [RemoteERP] ====================");
+        logger.info("Method: {}", request.getMethod());
+        logger.info("URI: {}", request.getRequestURI());
 
-        System.out.println("--- Headers ---");
+        logger.info("--- Headers ---");
         Collections.list(request.getHeaderNames())
-            .forEach(name -> System.out.println(name + ": " + request.getHeader(name)));
+            .forEach(name -> logger.info("{}: {}", name, request.getHeader(name)));
 
-        System.out.println("--- Body ---");
+        logger.info("--- Body ---");
         ContentCachingRequestWrapper wrapper = (ContentCachingRequestWrapper) request;
         byte[] body = wrapper.getContentAsByteArray();
         if (body.length > 0) {
-            System.out.println(new String(body, StandardCharsets.UTF_8));
+            logger.info(new String(body, StandardCharsets.UTF_8));
         } else {
-            System.out.println("[No Body]");
+            logger.info("[No Body]");
         }
 
-        // After logging, it can execute its specific business logic.
-        System.out.println("-> Executing RemoteERP business logic...");
-        System.out.println("=========================================================================\n");
+        logger.info("-> Executing RemoteERP business logic...");
+        logger.info("=========================================================================\n");
     }
 }
