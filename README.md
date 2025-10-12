@@ -110,14 +110,32 @@ public class BookController {
 Create a Spring bean that implements the `RequestProcessor` interface. The bean name must match the `destination` in the annotation.
 
 ```java
-@Service("remoteERP")
+@Service
 public class RemoteERP implements RequestProcessor {
+
+    private static final Logger logger = LoggerFactory.getLogger(RemoteERP.class);
 
     @Override
     public void process(HttpServletRequest request) {
-        // Add your logic here to process the mirrored request,
-        // e.g., send it to an external service.
-        System.out.println("Request mirrored to RemoteERP!");
+        logger.info("\n==================== HttpTwins Request for [RemoteERP] ====================");
+        logger.info("Method: {}", request.getMethod());
+        logger.info("URI: {}", request.getRequestURI());
+
+        logger.info("--- Headers ---");
+        Collections.list(request.getHeaderNames())
+                .forEach(name -> logger.info("{}: {}", name, request.getHeader(name)));
+
+        logger.info("--- Body ---");
+        ContentCachingRequestWrapper wrapper = (ContentCachingRequestWrapper) request;
+        byte[] body = wrapper.getContentAsByteArray();
+        if (body.length > 0) {
+            logger.info(new String(body, StandardCharsets.UTF_8));
+        } else {
+            logger.info("[No Body]");
+        }
+
+        logger.info("-> Executing RemoteERP business logic...");
+        logger.info("=========================================================================\n");
     }
 }
 ```
@@ -128,31 +146,35 @@ public class RemoteERP implements RequestProcessor {
 Use HTTP client attached with project to execute REST APIs attached with HTTPTwins
 
 ```java
-==================== HttpTwins Request for [RemoteERP] ====================
-
+2025-10-11T19:15:05.282+05:30  INFO 26586 --- [httpTwins] [nio-8080-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+        2025-10-11T19:15:05.283+05:30  INFO 26586 --- [httpTwins] [nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+        2025-10-11T19:15:05.289+05:30  INFO 26586 --- [httpTwins] [nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 6 ms
+2025-10-11T19:15:05.365+05:30  INFO 26586 --- [httpTwins] [       Thread-2] c.e.httpTwins.service.ReportingAgent     :
         --- HttpTwins Request for [ReportingAgent] ---
-Method: POST
-URI: /books
---- Headers ---
-Processing POST request for URI: /books
--> Executing ReportingAgent business logic...
-        --------------------------------------------
+        2025-10-11T19:15:05.365+05:30  INFO 26586 --- [httpTwins] [       Thread-1] c.example.httpTwins.service.RemoteERP    :
+        ==================== HttpTwins Request for [RemoteERP] ====================
+        2025-10-11T19:15:05.365+05:30  INFO 26586 --- [httpTwins] [       Thread-2] c.e.httpTwins.service.ReportingAgent     : Processing POST request for URI: /books
+2025-10-11T19:15:05.365+05:30  INFO 26586 --- [httpTwins] [       Thread-1] c.example.httpTwins.service.RemoteERP    : Method: POST
+2025-10-11T19:15:05.365+05:30  INFO 26586 --- [httpTwins] [       Thread-2] c.e.httpTwins.service.ReportingAgent     : -> Executing ReportingAgent business logic...
+        2025-10-11T19:15:05.365+05:30  INFO 26586 --- [httpTwins] [       Thread-1] c.example.httpTwins.service.RemoteERP    : URI: /books
+2025-10-11T19:15:05.365+05:30  INFO 26586 --- [httpTwins] [       Thread-2] c.e.httpTwins.service.ReportingAgent     : --------------------------------------------
 
-content-length: 83
-host: localhost:8080
-user-agent: Java-http-client/21.0.8
-content-type: application/json
---- Body ---
-        {
+        2025-10-11T19:15:05.365+05:30  INFO 26586 --- [httpTwins] [       Thread-1] c.example.httpTwins.service.RemoteERP    : --- Headers ---
+        2025-10-11T19:15:05.365+05:30  INFO 26586 --- [httpTwins] [       Thread-1] c.example.httpTwins.service.RemoteERP    : content-length: 83
+        2025-10-11T19:15:05.365+05:30  INFO 26586 --- [httpTwins] [       Thread-1] c.example.httpTwins.service.RemoteERP    : host: localhost:8080
+        2025-10-11T19:15:05.365+05:30  INFO 26586 --- [httpTwins] [       Thread-1] c.example.httpTwins.service.RemoteERP    : user-agent: Java-http-client/21.0.8
+        2025-10-11T19:15:05.365+05:30  INFO 26586 --- [httpTwins] [       Thread-1] c.example.httpTwins.service.RemoteERP    : content-type: application/json
+2025-10-11T19:15:05.365+05:30  INFO 26586 --- [httpTwins] [       Thread-1] c.example.httpTwins.service.RemoteERP    : --- Body ---
+        2025-10-11T19:15:05.365+05:30  INFO 26586 --- [httpTwins] [       Thread-1] c.example.httpTwins.service.RemoteERP    : {
         "title": "The Hitchhiker's Guide to the Galaxy",
         "author": "Douglas Adams"
         }
 
-        -> Executing RemoteERP business logic...
-        =========================================================================
-( These are dummy remote endpoints )
-HttpTwins ERROR: Failed to mirror request to remote destination 'https://ecom.buyers/items'. Reason: I/O error on POST request for "https://ecom.buyers/items": ecom.buyers
-HttpTwins ERROR: Failed to mirror request to remote destination 'https://http-twins-remote-test.free.beeceptor.com/regionalTests'. Reason: 404 Not Found on POST request for "https://http-twins-remote-test.free.beeceptor.com/regionalTests": "Hey ya! Great to see you here. BTW, nothing is configured here. Create a mock server on Beeceptor.com"
+        2025-10-11T19:15:05.365+05:30  INFO 26586 --- [httpTwins] [       Thread-1] c.example.httpTwins.service.RemoteERP    : -> Executing RemoteERP business logic...
+        2025-10-11T19:15:05.365+05:30  INFO 26586 --- [httpTwins] [       Thread-1] c.example.httpTwins.service.RemoteERP    : =========================================================================
+
+        2025-10-11T19:15:05.457+05:30 ERROR 26586 --- [httpTwins] [       Thread-4] c.e.h.s.RemoteDestinationProcessor       : HttpTwins ERROR: Failed to mirror request to remote destination 'https://ecom.buyers/items'. Reason: I/O error on POST request for "https://ecom.buyers/items": ecom.buyers
+2025-10-11T19:15:06.894+05:30 ERROR 26586 --- [httpTwins] [       Thread-3] c.e.h.s.RemoteDestinationProcessor       : HttpTwins ERROR: Failed to mirror request to remote destination 'https://http-twins-remote-test.free.beeceptor.com/regionalTests'. Reason: 404 Not Found on POST request for "https://http-twins-remote-test.free.beeceptor.com/regionalTests": "Hey ya! Great to see you here. BTW, nothing is configured here. Create a mock server on Beeceptor.com"
 
 ```
 
