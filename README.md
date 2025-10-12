@@ -86,15 +86,17 @@ public class BookController {
 
     @PostMapping
     @HttpTwins(
-        // Fan-out to multiple local Spring beans
-        localdestinations = {"remoteERP", "reportingAgent"},
-        
-        // Also send to multiple remote endpoints
-        remoteDestinations = {
-            "https://http-twins-remote-test.free.beeceptor.com/regionalTests",
-            "https://ecom.buyers/items"
-        }
-        ,active = false
+            // Fan-out to multiple local Spring beans
+            localdestinations = {RemoteERP.class, ReportingAgent.class},
+
+            // Also send to multiple remote endpoints
+            remoteDestinations = {
+                    // A test endpoint to receive mirrored requests
+                    "https://http-twins-remote-test.free.beeceptor.com/regionalTests",
+                    // A second remote destination
+                    "https://ecom.buyers/items" 
+            }
+            , active = true
     )
     public Book createBook(@RequestBody Book book) {
         // Your primary controller logic remains clean
