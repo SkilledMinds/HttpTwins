@@ -7,7 +7,7 @@
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law of or agreed to in writing, software
+ * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
@@ -48,8 +48,10 @@ public @interface HttpTwins {
     String[] remoteDestinations() default {};
 
     /**
-     * A boolean flag to enable or disable the annotation's functionality.
-     * Defaults to true.
+     * A flag to enable or disable the annotation's functionality. Defaults to "true".
+     * <p>
+     * This can be a boolean literal (e.g., "true" or "false") or a Spring property
+     * placeholder (e.g., "${http-twins.enabled}").
      */
-    boolean active() default true;
+    String active() default "true";
 }

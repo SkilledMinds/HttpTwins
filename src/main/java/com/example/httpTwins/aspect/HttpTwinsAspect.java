@@ -26,6 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.context.ApplicationContext;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -39,16 +40,18 @@ public class HttpTwinsAspect {
     private static final Logger logger = LoggerFactory.getLogger(HttpTwinsAspect.class);
 
     private final ApplicationContext applicationContext;
+    private final Environment environment;
     private final RequestProcessor defaultRequestProcessor;
 
-    public HttpTwinsAspect(ApplicationContext applicationContext) {
+    public HttpTwinsAspect(ApplicationContext applicationContext, Environment environment) {
         this.applicationContext = applicationContext;
+        this.environment = environment;
         this.defaultRequestProcessor = createDefaultProcessor();
     }
 
     @Before("@annotation(httpTwins)")
     public void fanoutHttpRequest(JoinPoint joinPoint, HttpTwins httpTwins) {
-        if (!httpTwins.active()) {
+        if (!isActive(httpTwins.active())) {
             return;
         }
 
@@ -72,6 +75,14 @@ public class HttpTwinsAspect {
                         new Thread(() -> defaultRequestProcessor.process(request)).start();
                     }
                 });
+    }
+
+    private boolean isActive(String activeValue) {
+        if (activeValue == null || activeValue.trim().isEmpty()) {
+            return false;
+        }
+        String resolvedValue = environment.resolvePlaceholders(activeValue);
+        return Boolean.parseBoolean(resolvedValue);
     }
 
     private void processLocalDestination(HttpServletRequest request, Class<? extends RequestProcessor> destinationClass) {

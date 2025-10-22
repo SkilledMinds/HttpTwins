@@ -35,7 +35,7 @@ public class BookController {
     }
 
     @GetMapping
-    @HttpTwins(localdestinations = ReportingAgent.class, active = false) // Fan-out to a local reporting agent
+    @HttpTwins(localdestinations = ReportingAgent.class, active = "${http-twins.get-books.enabled}") // Fan-out to a local reporting agent
     public List<Book> getBooks() {
         return bookRepository.findAll();
     }
@@ -47,7 +47,6 @@ public class BookController {
             "https://http-twins-remote-test.free.beeceptor.com/regionalTests", // A test endpoint to receive mirrored requests
             "https://ecom.buyers/items" // A second remote destination
         }
-        , active = true
     )
     public Book createBook(@RequestBody Book book) {
         return bookRepository.save(book);
